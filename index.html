@@ -65,12 +65,28 @@
   .inc .no{font-family:'Cormorant Garamond';font-size:1.05rem;color:var(--gold-lt);letter-spacing:.1em}
   .inc h3{font-family:'Cormorant Garamond';font-weight:500;font-size:1.4rem;margin:.5em 0 .3em}
   .inc p{font-size:.86rem;color:rgba(251,245,238,.68)}
-  .gallery{display:grid;grid-template-columns:1.25fr 1fr 1fr;grid-template-rows:230px 230px;gap:14px}
-  .tile{position:relative;border-radius:16px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 20px 40px -24px rgba(46,21,32,.5)}
-  .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(46,21,32,.6),transparent 55%);opacity:.9}
+  .gallery{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:210px;grid-auto-flow:dense;gap:14px}
+  .tile{position:relative;border-radius:16px;overflow:hidden;background-size:cover;background-position:center;box-shadow:0 20px 40px -24px rgba(46,21,32,.5);margin:0;cursor:zoom-in;border:0;padding:0;display:block;width:100%;background-color:var(--wine)}
+  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+  .tile:hover img,.tile:focus-visible img{transform:scale(1.06)}
+  .tile:focus-visible{outline:2px solid var(--gold-lt);outline-offset:3px}
+  .tile::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(to top,rgba(46,21,32,.72),rgba(46,21,32,.18) 42%,transparent 62%);opacity:.9}
   .tile figcaption{position:absolute;left:16px;bottom:14px;z-index:2;color:var(--ivory);font-family:'Cormorant Garamond';font-style:italic;font-size:1.2rem;text-shadow:0 2px 10px rgba(0,0,0,.4)}
   .tile figcaption span{display:block;font-family:'Jost';font-style:normal;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);margin-bottom:2px}
   .t-tall{grid-row:span 2}
+  .t-wide{grid-column:span 2}
+  .t-hero{grid-column:span 2;grid-row:span 2}
+  .gal-note{margin-top:18px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;font-family:'Jost';color:rgba(251,245,238,.55)}
+  .lb{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh;width:100%;height:100%;overflow:hidden;color:var(--ivory)}
+  .lb::backdrop{background:rgba(24,10,17,.94)}
+  .lb-fig{margin:0;height:100%;display:grid;grid-template-rows:1fr auto;align-items:center;justify-items:center;padding:56px 64px 22px}
+  .lb-fig img{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;box-shadow:0 40px 90px -30px #000}
+  .lb-cap{padding-top:14px;text-align:center;font-family:'Cormorant Garamond';font-style:italic;font-size:1.25rem}
+  .lb-cap span{display:block;font-family:'Jost';font-style:normal;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-lt);margin-bottom:4px}
+  .lb-btn{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:1px solid rgba(228,199,126,.45);background:rgba(46,21,32,.6);color:var(--gold-lt);font-size:1.2rem;line-height:1;cursor:pointer}
+  .lb-btn:hover{background:var(--wine)}
+  .lb-prev{left:12px}.lb-next{right:12px}
+  .lb-close{position:absolute;top:14px;right:14px;transform:none}
   .menu-card{background:var(--ivory);color:var(--ink);border-radius:22px;overflow:hidden;box-shadow:0 50px 90px -40px rgba(46,21,32,.6);border:1px solid var(--line);display:grid;grid-template-columns:1.35fr .95fr}
   .menu-left{padding:44px} .menu-right{background:var(--plum);color:var(--ivory);padding:44px 40px;position:relative}
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:22px}
@@ -139,8 +155,8 @@
   footer{background:var(--plum);color:rgba(251,245,238,.6);padding:46px 0;font-size:.8rem}
   .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;align-items:center} footer a{color:var(--gold-lt);text-decoration:none}
   .reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease} .reveal.in{opacity:1;transform:none}
-  @media(max-width:900px){.includes{grid-template-columns:1fr 1fr}.gallery{grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,180px)}.t-tall{grid-row:span 1}.menu-card{grid-template-columns:1fr}.menu-left,.menu-right{padding:34px 26px}}
-  @media(max-width:520px){.includes{grid-template-columns:1fr}.field-row{grid-template-columns:1fr}.gallery{grid-template-columns:1fr;grid-template-rows:repeat(5,200px)}.groc{columns:1}.co-fields,.pay-opts{grid-template-columns:1fr}}
+  @media(max-width:900px){.includes{grid-template-columns:1fr 1fr}.gallery{grid-template-columns:1fr 1fr;grid-auto-rows:180px}.t-hero{grid-column:span 2;grid-row:span 2}.t-wide{grid-column:span 2}.lb-fig{padding:52px 16px 18px}.menu-card{grid-template-columns:1fr}.menu-left,.menu-right{padding:34px 26px}}
+  @media(max-width:520px){.includes{grid-template-columns:1fr}.field-row{grid-template-columns:1fr}.gallery{grid-template-columns:1fr 1fr;grid-auto-rows:160px;gap:10px}.t-hero{grid-column:span 2;grid-row:span 2}.t-wide{grid-column:span 2}.t-tall{grid-row:span 2}.tile figcaption{left:12px;bottom:11px;font-size:1rem}.groc{columns:1}.co-fields,.pay-opts{grid-template-columns:1fr}}
   @media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto}.reveal{opacity:1;transform:none}.hero-bg{transform:none}}
 </style>
 <!-- ctb-seo-v2 --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Cabo Bachelorette Parties &amp; Private Celebrations"><meta name="twitter:description" content="One package, zero planning. Private chef, barman, yacht, transportation, welcome decor and grocery pre-stock for your bachelorette weekend in Los Cabos."><meta name="twitter:image" content="https://cabobachelorette.privatechefloscabos.com/assets/img-1.jpg"><!-- ctb-faq-v1 --><script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","url":"https://cabobachelorette.privatechefloscabos.com/","mainEntity":[{"@type":"Question","name":"What's included in the bachelorette package?","acceptedAnswer":{"@type":"Answer","text":"Welcome decor, a private chef, a craft barman, round-trip airport transfers, grocery pre-stock, a yacht escape, nightlife rides, and one concierge contact on WhatsApp from booking to boarding pass."}},{"@type":"Question","name":"Do we have to book everything, or can we pick pieces?","acceptedAnswer":{"@type":"Answer","text":"You choose. Tap only the services you want in the builder, or take the full package — every service is run by our own team so it all arrives on time."}},{"@type":"Question","name":"How many guests do the packages cover?","acceptedAnswer":{"@type":"Answer","text":"The chef, barman, grocery, yacht and decor are set packages for up to 12 guests. Airport rides are round-trip for up to 11 with luggage. Bigger group? Just ask."}},{"@type":"Question","name":"Can I see what each guest pays?","acceptedAnswer":{"@type":"Answer","text":"Yes. As you add services, the builder shows the per-guest, all-in price and the split alongside the weekend total, before you check out."}},{"@type":"Question","name":"What does the private chef serve?","acceptedAnswer":{"@type":"Answer","text":"A taco-party dinner or a mimosas brunch, cooked and served right in your villa."}},{"@type":"Question","name":"Are taxes and gratuity included?","acceptedAnswer":{"@type":"Answer","text":"Prices are in USD and a 8.5% tax is added. Gratuity is not included, and after-midnight nightlife returns add a late fee."}}]}</script></head>
@@ -173,14 +189,27 @@
 </section>
 <section class="band" style="padding-top:90px;padding-bottom:90px">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="eyebrow">The mood</span><h2 class="display">Elegant. And a lot of fun.</h2></div>
-    <div class="gallery reveal">
-      <figure class="tile t-tall" style="background-image:url(/assets/img-3.jpg)"><figcaption><span>Villa nights</span>Sparklers &amp; long tables</figcaption></figure>
-      <figure class="tile" style="background-image:url(/assets/img-4.jpg)"><figcaption><span>The bar</span>Margaritas on tap</figcaption></figure>
-      <figure class="tile" style="background-image:url(/assets/img-2.jpg)"><figcaption><span>Bride squad</span>Sunset &amp; sea views</figcaption></figure>
-      <figure class="tile" style="background-image:url(/assets/img-5.jpg)"><figcaption><span>Welcome decor</span>Styled to the theme</figcaption></figure>
-      <figure class="tile" style="background-image:url(/assets/img-6.jpg)"><figcaption><span>Private transfers</span>Airport &amp; nightlife</figcaption></figure>
+    <div class="sec-head reveal"><span class="eyebrow">The mood</span><h2 class="display">Elegant. And a lot of fun.</h2>
+      <p>Real weekends we have run &mdash; the villa, the table, the pool and the night out. Tap any photo to see it full size.</p></div>
+    <div class="gallery reveal" id="gallery">
+      <figure class="tile t-hero" data-i="0" tabindex="0" role="button" aria-label="Open photo: The girls"><img src="/assets/img-7.jpg" width="1024" height="768" alt="A bachelorette party in matching floral robes and flower crowns on the terrace of their Los Cabos villa" decoding="async"><figcaption><span>The girls</span>Robes, flower crowns, go</figcaption></figure>
+      <figure class="tile t-tall" data-i="1" tabindex="0" role="button" aria-label="Open photo: Pool hours"><img src="/assets/img-9.jpg" width="990" height="1320" alt="Bridesmaids toasting with champagne in a Los Cabos villa infinity pool above the Pacific" decoding="async"><figcaption><span>Pool hours</span>Champagne in the infinity edge</figcaption></figure>
+      <figure class="tile" data-i="2" tabindex="0" role="button" aria-label="Open photo: The bar"><img src="/assets/img-4.jpg" width="1133" height="749" alt="A margarita bar set up on a villa kitchen island with tequila, limes and salted glasses" decoding="async"><figcaption><span>The bar</span>Margaritas on tap</figcaption></figure>
+      <figure class="tile" data-i="3" tabindex="0" role="button" aria-label="Open photo: Villa nights"><img src="/assets/img-3.jpg" width="1320" height="1193" alt="Guests raising sparklers around a long candlelit dinner table inside a Los Cabos villa" decoding="async"><figcaption><span>Villa nights</span>Sparklers &amp; long tables</figcaption></figure>
+      <figure class="tile t-tall" data-i="4" tabindex="0" role="button" aria-label="Open photo: The table"><img src="/assets/img-11.jpg" width="1024" height="1301" alt="A grazing table lit by tall candles and fairy lights at a private villa celebration" decoding="async" loading="lazy"><figcaption><span>The table</span>Candlelight, all the way down</figcaption></figure>
+      <figure class="tile t-tall" data-i="5" tabindex="0" role="button" aria-label="Open photo: Getting ready"><img src="/assets/img-8.jpg" width="990" height="1320" alt="A bachelorette group in satin robes in front of a rose-gold balloon arch in their villa" decoding="async" loading="lazy"><figcaption><span>Getting ready</span>Satin robes &amp; a balloon arch</figcaption></figure>
+      <figure class="tile t-tall" data-i="6" tabindex="0" role="button" aria-label="Open photo: Theme night"><img src="/assets/img-16.jpg" width="990" height="1320" alt="Friends in coloured wigs and party outfits on a villa terrace above the sea" decoding="async" loading="lazy"><figcaption><span>Theme night</span>Wigs out, phones up</figcaption></figure>
+      <figure class="tile t-tall" data-i="7" tabindex="0" role="button" aria-label="Open photo: On the sand"><img src="/assets/img-13.jpg" width="990" height="1320" alt="A long dinner table set with candles and string lights on the beach at night in Los Cabos" decoding="async" loading="lazy"><figcaption><span>On the sand</span>Dinner where the beach ends</figcaption></figure>
+      <figure class="tile t-wide" data-i="8" tabindex="0" role="button" aria-label="Open photo: After dark"><img src="/assets/img-12.jpg" width="1024" height="960" alt="A long banquet table under warm string lights in a villa garden after sunset" decoding="async" loading="lazy"><figcaption><span>After dark</span>String lights &amp; a long table</figcaption></figure>
+      <figure class="tile t-wide" data-i="9" tabindex="0" role="button" aria-label="Open photo: The whole crew"><img src="/assets/img-10.jpg" width="1024" height="768" alt="A bachelorette group in swimsuits by a villa pool with the Cabo San Lucas Arch behind them" decoding="async" loading="lazy"><figcaption><span>The whole crew</span>The Arch behind you</figcaption></figure>
+      <figure class="tile t-tall" data-i="10" tabindex="0" role="button" aria-label="Open photo: The big day"><img src="/assets/img-14.jpg" width="941" height="1320" alt="Two wooden beach chairs dressed with flowers and Mr and Mrs signs on the sand in Los Cabos" decoding="async" loading="lazy"><figcaption><span>The big day</span>Mr &amp; Mrs, feet in the sand</figcaption></figure>
+      <figure class="tile" data-i="11" tabindex="0" role="button" aria-label="Open photo: Bride squad"><img src="/assets/img-2.jpg" width="1300" height="867" alt="The bride and her friends with personalised tote bags under a palapa at sunset in Los Cabos" decoding="async" loading="lazy"><figcaption><span>Bride squad</span>Sunset &amp; sea views</figcaption></figure>
+      <figure class="tile t-wide" data-i="12" tabindex="0" role="button" aria-label="Open photo: Day one"><img src="/assets/img-1.jpg" width="1320" height="1084" alt="Friends sitting on the edge of a villa pool with drinks, the ocean behind them" decoding="async" loading="lazy"><figcaption><span>Day one</span>Feet in, drinks up</figcaption></figure>
+      <figure class="tile" data-i="13" tabindex="0" role="button" aria-label="Open photo: The details"><img src="/assets/img-15.jpg" width="1024" height="745" alt="A beachfront table setting with red roses, candles and polished glassware" decoding="async" loading="lazy"><figcaption><span>The details</span>Roses, glassware, linen</figcaption></figure>
+      <figure class="tile" data-i="14" tabindex="0" role="button" aria-label="Open photo: Welcome decor"><img src="/assets/img-5.jpg" width="1300" height="975" alt="A villa entrance styled with a balloon garland and a personalised bachelorette sign" decoding="async" loading="lazy"><figcaption><span>Welcome decor</span>Styled to the theme</figcaption></figure>
+      <figure class="tile" data-i="15" tabindex="0" role="button" aria-label="Open photo: Private transfers"><img src="/assets/img-6.jpg" width="1320" height="742" alt="Two black SUVs waiting outside a Los Cabos villa for airport and nightlife transfers" decoding="async" loading="lazy"><figcaption><span>Private transfers</span>Airport &amp; nightlife</figcaption></figure>
     </div>
+    <p class="gal-note">Photographed at private villas across Los Cabos &middot; Cabo Travel Boutique</p>
   </div>
 </section>
 <section class="band band-wine" id="menu">
@@ -385,6 +414,42 @@ document.getElementById('grocList').innerHTML=Object.keys(GROC).map(cat=>{const 
 const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}}),{threshold:.15});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 renderOptions();calc();
+</script>
+<dialog class="lb" id="lightbox" aria-label="Photo viewer">
+  <figure class="lb-fig"><img id="lbImg" src="" alt=""><figcaption class="lb-cap" id="lbCap"></figcaption></figure>
+  <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous photo">&#8249;</button>
+  <button class="lb-btn lb-next" id="lbNext" aria-label="Next photo">&#8250;</button>
+  <button class="lb-btn lb-close" id="lbClose" aria-label="Close">&times;</button>
+</dialog>
+<script>
+/* Gallery lightbox. Reads the tiles already in the DOM, so adding a photo above
+   is enough - there is no second list to keep in sync. */
+(function(){
+  var dlg=document.getElementById('lightbox'); if(!dlg||!dlg.showModal) return;
+  var tiles=[].slice.call(document.querySelectorAll('#gallery .tile'));
+  var img=document.getElementById('lbImg'), cap=document.getElementById('lbCap'), at=0;
+  function show(i){
+    at=(i+tiles.length)%tiles.length;
+    var t=tiles[at], im=t.querySelector('img'), fc=t.querySelector('figcaption');
+    img.src=im.getAttribute('src'); img.alt=im.getAttribute('alt')||'';
+    cap.innerHTML=fc?fc.innerHTML:'';
+  }
+  tiles.forEach(function(t,i){
+    t.addEventListener('click',function(){show(i);dlg.showModal();});
+    t.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){e.preventDefault();show(i);dlg.showModal();}
+    });
+  });
+  document.getElementById('lbPrev').addEventListener('click',function(){show(at-1);});
+  document.getElementById('lbNext').addEventListener('click',function(){show(at+1);});
+  document.getElementById('lbClose').addEventListener('click',function(){dlg.close();});
+  dlg.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight')show(at+1);
+    if(e.key==='ArrowLeft')show(at-1);
+  });
+  /* Click on the backdrop - anywhere that is not the photo - closes it. */
+  dlg.addEventListener('click',function(e){ if(e.target===dlg||e.target.className==='lb-fig')dlg.close(); });
+})();
 </script>
 </body>
 </html>
