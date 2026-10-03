@@ -147,10 +147,22 @@ def swap(text, start, end, block):
 out = swap(src, '<!-- FAQ:START', '<!-- FAQ:END -->', visible)
 out = swap(out, '<!-- FAQ-LD:START', '<!-- FAQ-LD:END -->', jsonld)
 
+# El precio por invitada vive también en las meta descripciones, y ésas no las
+# regeneraba nadie: el 3-oct-2026 la página anunciaba «From $444 per guest»
+# mientras el constructor cobraba $442, porque el redondo de los traslados había
+# cambiado el día anterior. Un número suelto en un sitio que nadie vuelve a mirar
+# es exactamente el fallo que este archivo existe para evitar, así que se
+# reescribe aquí con el resto.
+desde = f'From {usd(full_per)} per guest'
+antes = len(re.findall(r'From \$[\d,]+ per guest', out))
+out = re.sub(r'From \$[\d,]+ per guest', desde, out)
+assert antes > 0, 'no se encontró «From $N per guest» en el HTML — ¿cambió la redacción?'
+
 # Parity: every question and answer in the markup must be readable on the page.
 for q, a in QA:
     assert q in out, q
     assert strip(a) in json.dumps(ld, ensure_ascii=False), q
 io.open(HTML, 'w', encoding='utf-8').write(out)
 print(f'FAQ: {len(QA)} questions, both halves from CFG.')
+print(f'Meta: «{desde}» escrito en {antes} sitio(s).')
 print(f'  full weekend {usd(full_total)} = {usd(full_per)}/guest | lean {usd(lean_total)} = {usd(lean_per)}/guest')
