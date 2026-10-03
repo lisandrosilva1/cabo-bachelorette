@@ -22,7 +22,10 @@ def cfg():
     """Read the builder's own price book rather than retyping it."""
     raw = re.search(r'const CFG=\{(.*?)\};', src, re.S).group(1)
     num = lambda k: float(re.search(k + r'\s*:\s*([0-9.]+)', raw).group(1))
-    tr = re.search(r'transfer:\{sjd:([0-9.]+),csl:([0-9.]+)\}', raw)
+    # El traslado se guarda como VIAJE REDONDO, que es lo que se vende y lo que
+    # cobra el constructor. Antes se guardaba el sencillo y aquí se multiplicaba
+    # por dos, y el texto del FAQ llamaba «round-trip» al precio de un sentido.
+    tr = re.search(r'transferRT:\{sjd:([0-9.]+),csl:([0-9.]+)\}', raw)
     return dict(tax=num('taxRate'), deposit=num('depositRate'),
                 sjd=float(tr.group(1)), csl=float(tr.group(2)),
                 chef=num('chefMeal'), barman=num('barman'), yacht=num('yacht'),
@@ -37,13 +40,13 @@ usd = lambda n: '$' + format(int(round(n)), ',d')
 # San Jose, one chef dinner, one night out.
 GUESTS = 10
 vehicles = math.ceil(GUESTS / 11)
-full_sub = (C['decor'] + C['chef'] + C['barman'] + C['sjd'] * 2 * vehicles
+full_sub = (C['decor'] + C['chef'] + C['barman'] + C['sjd'] * vehicles
             + C['grocery'] + C['yacht'] + C['night'] * vehicles)
 full_total = full_sub * (1 + C['tax'])
 full_per = full_total / GUESTS
 
 # The smallest thing worth calling a weekend: the chef and the airport rides.
-lean_total = (C['chef'] + C['sjd'] * 2 * vehicles) * (1 + C['tax'])
+lean_total = (C['chef'] + C['sjd'] * vehicles) * (1 + C['tax'])
 lean_per = lean_total / GUESTS
 
 QA = [
@@ -93,9 +96,10 @@ QA = [
  ("San José del Cabo or Cabo San Lucas?",
   f"San José is quieter, closer to the airport and better for a group that wants "
   f"long dinners; Cabo San Lucas is the marina, the clubs and the noise. Round-trip "
-  f"transfers run {usd(C['sjd'])} per vehicle to San José and {usd(C['csl'])} to "
-  f"Cabo San Lucas, so it barely moves the budget — choose on how you want the "
-  f"nights to feel, not on the transfer."),
+  f"airport transfers are {usd(C['sjd'])} per vehicle to San José and {usd(C['csl'])} to "
+  f"Cabo San Lucas — one vehicle carries up to eleven of you with luggage, and past "
+  f"eleven it is a second vehicle. Twenty dollars across a weekend: choose on how you "
+  f"want the nights to feel, not on the transfer."),
 
  ("Can you handle a group bigger than twelve?",
   "Yes, and you should tell us the real number early. The chef, barman, grocery, "
