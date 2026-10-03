@@ -1,0 +1,4 @@
+
+# Duplicados que crea macOS/iCloud al copiar archivos («index 2.html»).
+# Uno se coló en un commit y habría quedado publicado como página gemela.
+*[0-9].html
