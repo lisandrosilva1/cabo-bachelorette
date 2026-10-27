@@ -278,6 +278,7 @@
         <div class="rrow"><span>Subtotal</span><span class="n" id="subtotal">$0</span></div>
         <div class="rrow"><span>Tax (8.9%)</span><span class="n" id="tax">$0</span></div>
         <div class="rrow total"><span>Weekend total</span><span class="n" id="total">$0</span></div>
+        <p class="note" id="holidayNote">Dec 24 &ndash; Jan 5: holiday rate, +30% on services</p>
         <button class="btn btn-gold book" id="checkout">Buy now</button>
         <p class="note">Prices in USD. Chef, barman, grocery, yacht and decor are set packages for up to 12 guests. Airport rides are round-trip for up to 11 with luggage; after-midnight returns add a late fee. Gratuity not included. Bigger group? Just ask.</p>
       </div>
@@ -397,6 +398,19 @@
 <script>
 const CFG={taxRate:0.089,depositRate:0.30,whatsapp:"526241198107",email:"reservations@privatechefloscabos.com",
   transferRT:{sjd:220,csl:240},chefMeal:600,barman:300,yacht:1600,grocery:1030,decor:200,nightBase:120,nightLate:45};
+// Tarifa de fiestas (dueño, 27-oct-2026): +30 % solo a servicios si la llegada cae entre el
+// 24-dic y el 5-ene, cada año; entra al subtotal antes del impuesto. Única fuente de la tasa
+// y la ventana. HOLIDAY_SERVICES: solo lo que es servicio claro. Fuera a propósito:
+// grocery (mercancía), chef (chefMeal: el código no separa servicio de comida) y decor
+// (globos/letrero: material + montaje sin separar) — decide el dueño.
+const HOLIDAY={rate:0.30,from:[12,24],to:[1,5]};
+const HOLIDAY_SERVICES=['barman','transfer','yacht','nightlife'];
+const HOLIDAY_LABEL='Holiday rate (+'+Math.round(HOLIDAY.rate*100)+'% on services)';
+const HOLIDAY_NOTE=(()=>{const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return M[HOLIDAY.from[0]-1]+' '+HOLIDAY.from[1]+' \u2013 '+M[HOLIDAY.to[0]-1]+' '+HOLIDAY.to[1]+': holiday rate, +'+Math.round(HOLIDAY.rate*100)+'% on services';})();
+function isHolidayDate(iso){const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');if(!m)return false;
+  const md=(+m[2])*100+(+m[3]),from=HOLIDAY.from[0]*100+HOLIDAY.from[1],to=HOLIDAY.to[0]*100+HOLIDAY.to[1];
+  return from<=to?(md>=from&&md<=to):(md>=from||md<=to);}
 const S={guests:10,nights:3,dest:'sjd',arrival:'',chefMeals:1,chefMenu:'taco',nightlifeNights:1,lateNight:false,
   on:{decor:false,chef:true,barman:false,transfer:true,grocery:false,yacht:false,nightlife:false}};
 const CO={pay:'deposit'};
@@ -413,7 +427,9 @@ function items(){const v=vehicles();return{
 };}
 const money=n=>'$'+Math.round(n).toLocaleString('en-US');
 const order=['decor','chef','barman','transfer','grocery','yacht','nightlife'];
-function totals(){const it=items();let sub=0;order.forEach(k=>{if(S.on[k])sub+=it[k].amt;});const tax=sub*CFG.taxRate;const total=sub+tax;return{sub,tax,total,per:S.guests>0?total/S.guests:0};}
+function totals(){const it=items();let sub=0,services=0;order.forEach(k=>{if(S.on[k]){sub+=it[k].amt;if(HOLIDAY_SERVICES.includes(k))services+=it[k].amt;}});
+  const holiday=isHolidayDate(S.arrival)?Math.round(services*HOLIDAY.rate*100)/100:0;sub+=holiday;
+  const tax=sub*CFG.taxRate;const total=sub+tax;return{sub,holiday,tax,total,per:S.guests>0?total/S.guests:0};}
 function extras(k){
   if(k==='chef'&&S.on.chef){const chips=[['taco','Taco party'],['brunch','Mimosas brunch'],['custom','Custom']].map(c=>'<button class="chip '+(S.chefMenu===c[0]?'on':'')+'" data-choice="'+c[0]+'">'+c[1]+'</button>').join('');
     return '<div class="subctl">'+chips+'<span class="mini-step"><button data-mini="chefMeals" data-dir="-1">\u2212</button><span>'+S.chefMeals+'</span><button data-mini="chefMeals" data-dir="1">+</button></span>meals</div>';}
@@ -426,12 +442,15 @@ function renderOptions(){const it=items();document.getElementById('options').inn
 function animateTo(el,target){const start=parseFloat(el.dataset.v||0),t0=performance.now();cancelAnimationFrame(el._raf);
   const tick=now=>{const p=Math.min((now-t0)/450,1),val=start+(target-start)*(1-Math.pow(1-p,3));el.textContent=money(val);el.dataset.v=val;if(p<1)el._raf=requestAnimationFrame(tick);else{el.textContent=money(target);el.dataset.v=target;}};el._raf=requestAnimationFrame(tick);}
 function calc(){const it=items();const t=totals();const lines=order.filter(k=>S.on[k]).map(k=>'<div class="rrow"><span>'+it[k].t+'</span><span class="n">'+money(it[k].amt)+'</span></div>');
+  if(t.holiday)lines.push('<div class="rrow"><span>'+HOLIDAY_LABEL+'</span><span class="n">'+money(t.holiday)+'</span></div>');
   document.getElementById('lines').innerHTML=lines.join('')||'<div class="rrow" style="opacity:.6"><span>No services selected yet</span><span></span></div>';
+  const hn=document.getElementById('holidayNote');hn.textContent=HOLIDAY_NOTE;hn.style.display=S.arrival?'none':'';
   document.getElementById('subtotal').textContent=money(t.sub);document.getElementById('tax').textContent=money(t.tax);
   animateTo(document.getElementById('total'),t.total);animateTo(document.getElementById('perGuest'),t.per);
   document.getElementById('perGuestCap').textContent='each \u00b7 split '+S.guests+' ways';
   document.getElementById('waFoot').href=waLink();}
-function orderText(){const it=items();return order.filter(k=>S.on[k]).map(k=>'\u2022 '+it[k].t+' \u2014 '+money(it[k].amt)).join('\n');}
+function orderText(){const it=items();const t=totals();const ls=order.filter(k=>S.on[k]).map(k=>'\u2022 '+it[k].t+' \u2014 '+money(it[k].amt));
+  if(t.holiday)ls.push('\u2022 '+HOLIDAY_LABEL+' \u2014 '+money(t.holiday));return ls.join('\n');}
 function tripLine(){return S.guests+' guests \u00b7 '+S.nights+' nights \u00b7 '+(S.dest==='sjd'?'San Jose':'Cabo San Lucas')+(S.arrival?' \u00b7 arriving '+S.arrival:'');}
 function waLink(extra){const t=totals();const body='Hi! We\'re planning a bachelorette in Cabo \u2728\n'+tripLine()+'\n\n'+(orderText()||'(still choosing services)')+'\n\nTotal: '+money(t.total)+' ('+money(t.per)+'/guest).'+(extra?'\n'+extra:'');
   return 'https://wa.me/'+CFG.whatsapp+'?text='+encodeURIComponent(body);}
@@ -448,18 +467,21 @@ document.body.addEventListener('click',e=>{
   const dst=e.target.closest('[data-dest]');if(dst){S.dest=dst.dataset.dest;document.querySelectorAll('#dest button').forEach(b=>b.classList.toggle('on',b===dst));renderOptions();calc();}
   const all=e.target.closest('[data-all]');if(all){const v=all.dataset.all==='on';Object.keys(S.on).forEach(k=>S.on[k]=v);renderOptions();calc();}
   if(e.target.closest('[data-close]')){document.getElementById('grocModal').classList.remove('open');document.getElementById('coModal').classList.remove('open');}});
-document.getElementById('date').addEventListener('change',e=>{S.arrival=e.target.value;});
+document.getElementById('date').addEventListener('change',e=>{S.arrival=e.target.value;calc();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.getElementById('grocModal').classList.remove('open');document.getElementById('coModal').classList.remove('open');}});
 
 /* ---- checkout ---- */
-function openCheckout(){const t=totals();
-  if(t.sub<=0){alert('Add at least one service to check out.');return;}
+function renderCheckoutSummary(){const t=totals();
   document.getElementById('coSummary').innerHTML=order.filter(k=>S.on[k]).map(k=>{const it=items();return '<div class="r"><span>'+it[k].t+'</span><span>'+money(it[k].amt)+'</span></div>';}).join('')
+    +(t.holiday?'<div class="r"><span>'+HOLIDAY_LABEL+'</span><span>'+money(t.holiday)+'</span></div>':'')
     +'<div class="r"><span>Tax (8.9%)</span><span>'+money(t.tax)+'</span></div>'
     +'<div class="r tot"><span>Total \u00b7 '+money(t.per)+'/guest</span><b>'+money(t.total)+'</b></div>';
   document.getElementById('payDep').textContent=money(t.total*CFG.depositRate);
   document.getElementById('payBal').textContent=money(t.total*(1-CFG.depositRate));
-  document.getElementById('payFull').textContent=money(t.total);
+  document.getElementById('payFull').textContent=money(t.total);}
+function openCheckout(){const t=totals();
+  if(t.sub<=0){alert('Add at least one service to check out.');return;}
+  renderCheckoutSummary();
   document.getElementById('coDate').value=S.arrival||'';
   document.getElementById('coNights').value=S.nights;
   document.getElementById('coErr').classList.remove('show');
@@ -467,7 +489,7 @@ function openCheckout(){const t=totals();
   document.getElementById('coModal').classList.add('open');}
 document.getElementById('checkout').addEventListener('click',openCheckout);
 document.querySelector('.pay-opts').addEventListener('click',e=>{const p=e.target.closest('[data-pay]');if(!p)return;CO.pay=p.dataset.pay;document.querySelectorAll('.pay').forEach(x=>x.classList.toggle('on',x===p));});
-document.getElementById('coDate').addEventListener('change',e=>{S.arrival=e.target.value;document.getElementById('date').value=e.target.value;});
+document.getElementById('coDate').addEventListener('change',e=>{S.arrival=e.target.value;document.getElementById('date').value=e.target.value;calc();renderCheckoutSummary();});
 function addDays(iso,n){const d=new Date(iso+'T00:00:00');d.setDate(d.getDate()+n);return d.toISOString().slice(0,10);}
 function calLink(name,detail){if(!S.arrival)return '#';const end=addDays(S.arrival,Math.max(1,S.nights));const f=s=>s.replace(/-/g,'');
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Cabo Bachelorette \u2014 '+(name||'Our trip'))+'&dates='+f(S.arrival)+'/'+f(end)+'&details='+encodeURIComponent(detail)+'&location='+encodeURIComponent('Los Cabos, Mexico');}
